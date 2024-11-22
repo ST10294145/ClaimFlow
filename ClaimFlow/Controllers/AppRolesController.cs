@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ClaimFlow.Controllers
 {
+    [Authorize]
     public class AppRolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
