@@ -3,6 +3,44 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to ClaimFlow</h1>
+    <p class="lead">Streamlining your claims process with ease and efficiency.</p>
+    <p>Discover how ClaimFlow can help you manage your claims faster and more effectively.</p>
+
+    <!-- Add a featured image -->
+    <img src="~/images/claimflow-featured.jpg" alt="ClaimFlow Featured" class="img-fluid rounded" />
+
+    <hr class="my-4">
+
+    <h3>What We Do</h3>
+    <p>At ClaimFlow, we provide tools and resources to ensure that your claims are handled quickly and smoothly. Our features include:</p>
+
+    <div class="row text-center">
+        <div class="col-md-4">
+            <h4>Easy Submission</h4>
+            <p>Submit your claims in just a few clicks with our user-friendly interface.</p>
+        </div>
+        <div class="col-md-4">
+            <h4>Track Progress</h4>
+            <p>Monitor the status of your claims at any time, with real-time updates.</p>
+        </div>
+        <div class="col-md-4">
+            <h4>Stay Informed</h4>
+            <p>Receive notifications and reminders so you never miss an important update.</p>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- Call to Action Section -->
+    <h3>Ready to Get Started?</h3>
+    <p>Start using ClaimFlow today and streamline your claims process.</p>
+    <a href="@Url.Action("Index", "Claim")" class="btn btn-primary btn-lg">Create Your First Claim</a>
+
+    <hr class="my-4">
+
+    <!-- Footer Section -->
+    <footer class="mt-4">
+        <p>© 2024 ClaimFlow. All rights reserved. | <a href="/Privacy">Privacy Policy</a></p>
+    </footer>
 </div>

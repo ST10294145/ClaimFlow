@@ -123,40 +123,34 @@ namespace ClaimFlow.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     // Ensure the role exists before assigning
-                    if (!await _roleManager.RoleExistsAsync("User"))
+                    if (result.Succeeded)
                     {
-                        await _roleManager.CreateAsync(new IdentityRole("User"));
-                    }
+                        _logger.LogInformation("User created a new account with password.");
 
-                    // Assign the role to the new user
-                    var roleResult = await _userManager.AddToRoleAsync(user, "User");
-                    if (!roleResult.Succeeded)
-                    {
-                        _logger.LogError("Role assignment failed: {0}", string.Join(", ", roleResult.Errors.Select(e => e.Description)));
-                        ModelState.AddModelError(string.Empty, "Role assignment failed.");
-                        return Page(); // Prevent proceeding if role assignment fails
-                    }
+                        // Assign the selected role
+                        await _userManager.AddToRoleAsync(user, Input.Role);
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
                     }
                 }
 
@@ -167,7 +161,8 @@ namespace ClaimFlow.Areas.Identity.Pages.Account
                 }
             }
 
-            return Page();
+            // Ensure we always return a value in case of invalid state or errors
+            return Page(); // This ensures the method always returns an IActionResult
         }
 
         private ApplicationUser CreateUser()
@@ -178,8 +173,8 @@ namespace ClaimFlow.Areas.Identity.Pages.Account
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
+                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
