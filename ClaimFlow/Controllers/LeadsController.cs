@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ClaimFlow.Controllers
 {
-    [Authorize]
+    [Authorize(Roles="Admin")]
     public class LeadsController : Controller
     {
         
