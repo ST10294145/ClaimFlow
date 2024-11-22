@@ -7,11 +7,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ClaimFlow.Data;
 using ClaimFlow.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ClaimFlow.Controllers
 {
+    [Authorize]
     public class LeadsController : Controller
     {
+        
+
         private readonly ApplicationDbContext _context;
 
         public LeadsController(ApplicationDbContext context)
