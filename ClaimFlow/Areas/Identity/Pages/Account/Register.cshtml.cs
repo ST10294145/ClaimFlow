@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
-
 namespace ClaimFlow.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -82,7 +81,6 @@ namespace ClaimFlow.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
 
             [Required]
-
             public string? Role { get; set; }
 
             [ValidateNever]
@@ -108,6 +106,7 @@ namespace ClaimFlow.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -116,14 +115,27 @@ namespace ClaimFlow.Areas.Identity.Pages.Account
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 user.Firstname = Input.Firstname;
                 user.Lastname = Input.Lastname;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Assign the "User" role directly
-                    await _userManager.AddToRoleAsync(user, "User");
+                    // Ensure the role exists before assigning
+                    if (!await _roleManager.RoleExistsAsync("User"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("User"));
+                    }
+
+                    // Assign the role to the new user
+                    var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                    if (!roleResult.Succeeded)
+                    {
+                        _logger.LogError("Role assignment failed: {0}", string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                        ModelState.AddModelError(string.Empty, "Role assignment failed.");
+                        return Page(); // Prevent proceeding if role assignment fails
+                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -147,6 +159,8 @@ namespace ClaimFlow.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
+
+                // Handle creation errors
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
