@@ -32,7 +32,7 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/claimflow.git
+    git clone https://github.com/ST10294145/ClaimFlow.git
     ```
 
 2. **Navigate to the project directory**:
